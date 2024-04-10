@@ -16,27 +16,7 @@
   },
   { 
     "id": 4,
-    "name": "Mary Poppendieck 1", 
-    "number": "39-23-64231221"
-  },
-  { 
-    "id": 5,
-    "name": "Arto Hellas 1", 
-    "number": "040-1234561"
-  },
-  { 
-    "id": 6,
-    "name": "Ada Lovelace 1", 
-    "number": "39-44-53235231"
-  },
-  { 
-    "id": 7,
-    "name": "Dan Abramov 1", 
-    "number": "12-43-2343451"
-  },
-  { 
-    "id": 8,
-    "name": "Mary Poppendieck 1", 
-    "number": "39-23-64231221"
+    "name": "Mary Poppendieck", 
+    "number": "39-23-6423122"
   }
 ]

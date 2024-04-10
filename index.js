@@ -13,11 +13,14 @@ app.use(cors())
 
 let persons = require('./data.json')
 
+const generateId = () => {
+    const maxId = persons.length > 0
+      ? Math.max(...persons.map(n => n.id))
+      : 0
+    return maxId + 1
+  }
+
 //GET requests
-app.get('/', (request, response) => {
-    response.send('<h1>Hello World!</h1>')
-})
-  
 app.get('/api/persons', (request, response) => {
     response.json(persons)
 })
@@ -46,56 +49,85 @@ app.get('/api/persons/:id', (request, response) => {
 
 //POST requests
 app.post('/api/persons', (request, response) => {
-    const body = request.body
-
-    if (!body.name && !body.number) {
-        return response.status(400).json({
-            error: 'Name and number missing'
-        })
+    if (!request.body.name || !request.body.number) {
+        response.status(400).end()
+    } else {
+        const newPerson = {
+            id: generateId(),
+            name: request.body.name,
+            number: request.body.number
+        }
+        persons = persons.concat(newPerson)
+        response.status(200).json(newPerson)
     }
-
-    if (!body.name) {
-        return response.status(400).json({
-            error: 'Name missing'
-        })
-    }
-
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'Number missing'
-        })
-    }
-
-    if (persons.filter(person => person.name === body.name)) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
-
-	const person = {
-        id: Math.floor(Math.random() * 1000000),
-        name: body.name,
-        number: body.number
-    }  
-	console.log(persons)
-
-    persons = persons.concat(person)
-	response.json(persons)
 })
+
+// app.post('/api/persons', (request, response) => {
+//     const body = request.body
+
+//     if (!body.name && !body.number) {
+//         return response.status(400).json({
+//             error: 'Name and number missing'
+//         })
+//     }
+
+//     if (!body.name) {
+//         return response.status(400).json({
+//             error: 'Name missing'
+//         })
+//     }
+
+//     if (!body.number) {
+//         return response.status(400).json({
+//             error: 'Number missing'
+//         })
+//     }
+
+//     if (persons.filter(person => person.name === body.name)) {
+//         return response.status(400).json({
+//             error: 'name must be unique'
+//         })
+//     }
+
+// 	const person = {
+//         id: Math.floor(Math.random() * 1000000),
+//         name: body.name,
+//         number: body.number
+//     }  
+// 	console.log(persons)
+
+//     persons = persons.concat(person)
+// 	response.json(persons)
+// })
+
 
 //DELETE requests
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    const person = persons.filter(person => person.id === id)
+    const person = persons.find(person => person.id === id)
     if (person) {
-        console.log("person", person)
-        response.status(200).json(person)
+        persons = persons.filter(person => person.id !== id)
+        response.status(200).send(person)
     } else {
         response.status(204).end()
     }
 })
 
-
+//UPDATE requests
+app.put('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    if (!request.body.name || !request.body.number) {
+        response.status(400).end()
+    } else {
+        const updatedPerson = {
+            id: id,
+            name: request.body.name,
+            number: request.body.number
+        }
+        persons = persons.map(p => p.id !== id? p : updatedPerson)
+        response.status(200).json(updatedPerson)
+    }
+})
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
