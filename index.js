@@ -52,27 +52,27 @@ app.get('/api/persons', (request, response) => {
       })
 })
 
-app.get('/info', (request, response) => {
-    const length = persons.length
-    const time = (new Date()).toString()
-    response.send(`
-    <div>
-        <p>Phonebook has info for ${length} people</p>
-        <p>${time}</p>
-    </div>
-    `)
-})
+// app.get('/info', (request, response) => {
+//     const length = persons.length
+//     const time = (new Date()).toString()
+//     response.send(`
+//     <div>
+//         <p>Phonebook has info for ${length} people</p>
+//         <p>${time}</p>
+//     </div>
+//     `)
+// })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
+// app.get('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     const person = persons.find(person => person.id === id)
 
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
-})
+//     if (person) {
+//         response.json(person)
+//     } else {
+//         response.status(404).end()
+//     }
+// })
 
 //POST requests
 app.post('/api/persons', (request, response) => {
@@ -136,32 +136,32 @@ app.post('/api/persons', (request, response) => {
 
 
 //DELETE requests
-app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = persons.find(person => person.id === id)
-    if (person) {
-        persons = persons.filter(person => person.id !== id)
-        response.status(200).send(person)
-    } else {
-        response.status(204).end()
-    }
-})
+// app.delete('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     const person = persons.find(person => person.id === id)
+//     if (person) {
+//         persons = persons.filter(person => person.id !== id)
+//         response.status(200).send(person)
+//     } else {
+//         response.status(204).end()
+//     }
+// })
 
 //UPDATE requests
-app.put('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    if (!request.body.name || !request.body.number) {
-        response.status(400).end()
-    } else {
-        const updatedPerson = {
-            id: id,
-            name: request.body.name,
-            number: request.body.number
-        }
-        persons = persons.map(p => p.id !== id? p : updatedPerson)
-        response.status(200).json(updatedPerson)
-    }
-})
+// app.put('/api/persons/:id', (request, response) => {
+//     const id = Number(request.params.id)
+//     if (!request.body.name || !request.body.number) {
+//         response.status(400).end()
+//     } else {
+//         const updatedPerson = {
+//             id: id,
+//             name: request.body.name,
+//             number: request.body.number
+//         }
+//         persons = persons.map(p => p.id !== id? p : updatedPerson)
+//         response.status(200).json(updatedPerson)
+//     }
+// })
 
 const PORT = process.env.PORT
 
