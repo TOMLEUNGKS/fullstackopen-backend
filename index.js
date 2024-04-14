@@ -4,27 +4,19 @@ const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
 
-// const mongoose = require('mongoose')
-
 const app = express()
-// const password = process.argv[2]
-// const url = `mongodb+srv://tomleungks:${password}@cluster0.bn0dc4t.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`
 
 morgan.token('req-body', (req, res) => JSON.stringify(req.body));
 
 app.use(morgan(':method :url :status :response-time ms - :res[content-length] :req-body'));
-
 app.use(express.json())
 app.use(cors())
 app.use(express.static('dist'))
 
-// mongoose.set('strictQuery',false)
-// mongoose.connect(url)
-
-const generateId = async () => {
-    const maxId = await Person.findOne().sort({id: -1}).select('id').lean()
-    return maxId? maxId.id + 1 : 1
-}
+// const generateId = async () => {
+//     const maxId = await Person.findOne().sort({id: -1}).select('id').lean()
+//     return maxId? maxId.id + 1 : 1
+// }
 
 //GET requests
 app.get('/api/persons', (request, response, next) => {
@@ -35,16 +27,19 @@ app.get('/api/persons', (request, response, next) => {
     .catch(error => next(error))
 })
 
-// app.get('/info', (request, response) => {
-//     const length = persons.length
-//     const time = (new Date()).toString()
-//     response.send(`
-//     <div>
-//         <p>Phonebook has info for ${length} people</p>
-//         <p>${time}</p>
-//     </div>
-//     `)
-// })
+app.get('/info', (request, response) => {
+    const time = (new Date()).toString()
+    Person.countDocuments({})
+    .then(count => {
+        response.status(200).send(`
+        <div>
+            <p>Phonebook has info for ${count} people</p>
+            <p>${time}</p>
+        </div>
+        `)
+    })
+    .catch(error => next(error))
+})
 
 app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id)
@@ -57,7 +52,6 @@ app.get('/api/persons/:id', (request, response, next) => {
     })
     .catch(error => {
         next(error)
-        console.log(error)      
         response.status(400).send({ error: 'malformatted id' })     
     })
 })
@@ -67,19 +61,16 @@ app.post('/api/persons', (request, response) => {
     if (!request.body.name || !request.body.number) {
         response.status(400).end()
     } else {
-        (async() => {
-            const id = await generateId()
-            const newPerson = new Person({
-                id: id,
-                name: request.body.name,
-                number: request.body.number
-            })
-            newPerson.save().then(result => {
-                console.log('new person saved!')
-                mongoose.connection.close()
-            })
-            response.status(200).json(newPerson)
-        })()
+        const id = Math.floor(Math.random() * 100)
+        const newPerson = new Person({
+            id: id,
+            name: request.body.name,
+            number: request.body.number
+        })
+        newPerson.save().then(result => {
+            console.log('new person saved!')
+        })
+        response.status(200).json(newPerson)
     }
 })
 
@@ -133,7 +124,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
 })
 
 //UPDATE requests
-app.put('/api/persons/:id', (request, response) => {
+app.put('/api/persons/:id', (request, response, next) => {
     const name = request.body.name
     const number = request.body.number
     const person = {
@@ -150,6 +141,13 @@ app.put('/api/persons/:id', (request, response) => {
         response.status(400).end()
     }
 })
+ 
+const errorHandler = (error, request, response, next) => {
+    console.error(error.message)
+    next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 
